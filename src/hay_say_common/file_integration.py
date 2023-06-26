@@ -49,7 +49,15 @@ def model_dirs(architecture_name):
     custom_model_path = os.path.join(ROOT_DIR, 'custom_models', architecture_name)
     if os.path.exists(custom_model_path):
         dirs.append(custom_model_path)
+    characters_dir = os.path.join(ROOT_DIR, 'models', architecture_name, 'characters')
+    if os.path.exists(characters_dir):
+        dirs.append(characters_dir)
     return dirs
+
+
+def multispeaker_model_dir(architecture_name):
+    """Returns the directory where multi-speaker models are stored for the given architecture."""
+    return os.path.join(ROOT_DIR, 'models', architecture_name, 'multispeaker_models')
 
 
 def read_metadata(folder):
