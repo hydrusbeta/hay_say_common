@@ -29,7 +29,10 @@ from .file_integration import (
 from .utility import (
     get_audio_from_src_attribute,
     read_audio,
-    get_singleton_file
+    get_singleton_file,
+    get_single_file_with_extension,
+    get_files_with_extension,
+    get_files_ending_with
 )
 
 from .server_utility import (
