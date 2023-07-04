@@ -8,6 +8,10 @@ import os
 or specific to servers"""
 
 
+def create_link(existing_path, desired_link_path):
+    if not os.path.exists(desired_link_path):
+        os.symlink(existing_path, desired_link_path)
+
 def get_audio_from_src_attribute(src, encoding):
     _, raw = src.split(',')
     b64_output_bytes = raw.encode(encoding)

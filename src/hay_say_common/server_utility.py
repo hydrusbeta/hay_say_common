@@ -10,11 +10,6 @@ import json
 """Methods that are useful across multiple architecture servers"""
 
 
-def create_link(existing_path, desired_link_path):
-    if not os.path.exists(desired_link_path):
-        os.symlink(existing_path, desired_link_path)
-
-
 def get_model_path(architecture, character):
     character_dir = [os.path.join(model_dir, character)
                      for model_dir in model_dirs(architecture)

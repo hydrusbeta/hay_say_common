@@ -15,6 +15,7 @@ from .file_integration import (
     CACHE_MIMETYPE,
     model_dirs,
     character_dir,
+    multispeaker_model_dir,
     read_metadata,
     write_metadata,
     read_audio_from_cache,
@@ -28,6 +29,7 @@ from .file_integration import (
 )
 
 from .utility import (
+    create_link,
     get_audio_from_src_attribute,
     read_audio,
     get_singleton_file,
@@ -37,7 +39,6 @@ from .utility import (
 )
 
 from .server_utility import (
-    create_link,
     get_model_path,
     clean_up,
     construct_full_error_message,

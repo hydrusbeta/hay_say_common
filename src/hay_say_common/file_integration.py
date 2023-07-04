@@ -65,9 +65,9 @@ def character_dir(architecture_name, character_name):
     return os.path.join(MODELS_DIR, architecture_name, 'characters', character_name)
 
 
-def multispeaker_model_dir(architecture_name):
+def multispeaker_model_dir(architecture_name, model_name):
     """Returns the directory where multi-speaker models are stored for the given architecture."""
-    return os.path.join(MODELS_DIR, architecture_name, 'multispeaker_models')
+    return os.path.join(MODELS_DIR, architecture_name, 'multispeaker_models', model_name)
 
 
 def read_metadata(folder):
