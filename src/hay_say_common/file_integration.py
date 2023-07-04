@@ -15,6 +15,7 @@ RAW_DIR = os.path.join(AUDIO_FOLDER, 'raw')
 PREPROCESSED_DIR = os.path.join(AUDIO_FOLDER, 'preprocessed')
 OUTPUT_DIR = os.path.join(AUDIO_FOLDER, 'output')
 POSTPROCESSED_DIR = os.path.join(AUDIO_FOLDER, 'postprocessed')
+MODELS_DIR = os.path.join(ROOT_DIR, 'models')
 METADATA_FILENAME = 'metadata.json'
 TIMESTAMP_FORMAT = '%Y/%m/%d %H:%M:%S.%f'
 MAX_FILES_PER_CACHE_FOLDER = 25
@@ -55,9 +56,18 @@ def model_dirs(architecture_name):
     return dirs
 
 
+def character_dir(architecture_name, character_name):
+    """Returns the directory where the files for a given character model should be stored when that character is
+    downloaded using the individual character download mechanism in the UI.
+    Important! Do not use this method to find an existing character directory. It is possible for users to download
+    characters using model packs, and those character directories are stored elsewhere. Instead, you should
+    search for the character directory within the directories returned by model_dirs."""
+    return os.path.join(MODELS_DIR, architecture_name, 'characters', character_name)
+
+
 def multispeaker_model_dir(architecture_name):
     """Returns the directory where multi-speaker models are stored for the given architecture."""
-    return os.path.join(ROOT_DIR, 'models', architecture_name, 'multispeaker_models')
+    return os.path.join(MODELS_DIR, architecture_name, 'multispeaker_models')
 
 
 def read_metadata(folder):

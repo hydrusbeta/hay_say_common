@@ -14,6 +14,7 @@ from .file_integration import (
     CACHE_EXTENSION,
     CACHE_MIMETYPE,
     model_dirs,
+    character_dir,
     read_metadata,
     write_metadata,
     read_audio_from_cache,
