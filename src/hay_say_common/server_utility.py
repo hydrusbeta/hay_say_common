@@ -7,9 +7,7 @@ import traceback
 import json
 
 
-def create_link(existing_path, desired_link_path):
-    if not os.path.exists(desired_link_path):
-        os.symlink(existing_path, desired_link_path)
+"""Methods that are useful across multiple architecture servers"""
 
 
 def get_model_path(architecture, character):
@@ -57,4 +55,4 @@ def get_file_list(folder):
     if os.path.exists(folder):
         return ', '.join(os.listdir(folder))
     else:
-        return 'directory does not exist'
+        return folder + ' does not exist'

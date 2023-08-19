@@ -14,6 +14,11 @@ from .file_integration import (
     CACHE_EXTENSION,
     CACHE_MIMETYPE,
     model_dirs,
+    model_pack_dirs,
+    custom_model_dir,
+    characters_dir,
+    character_dir,
+    multispeaker_model_dir,
     read_metadata,
     write_metadata,
     read_audio_from_cache,
@@ -27,13 +32,16 @@ from .file_integration import (
 )
 
 from .utility import (
+    create_link,
     get_audio_from_src_attribute,
     read_audio,
-    get_singleton_file
+    get_singleton_file,
+    get_single_file_with_extension,
+    get_files_with_extension,
+    get_files_ending_with
 )
 
 from .server_utility import (
-    create_link,
     get_model_path,
     clean_up,
     construct_full_error_message,
