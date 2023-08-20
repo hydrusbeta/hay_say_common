@@ -11,7 +11,7 @@ or specific to servers"""
 def create_link(existing_path, desired_link_path):
     """Guarantees the existence of a symlink file at desired_link_path pointing at existing_path. If a file already
     exists at desired_link_path, it will be replaced if it is not already a link file that is pointing at
-    existing_path"""
+    existing_path. existing_path must exist, and the directory name of desired_link_path must exist."""
     # Check if link file does not exist yet.
     if not os.path.lexists(desired_link_path):
         os.symlink(existing_path, desired_link_path)
