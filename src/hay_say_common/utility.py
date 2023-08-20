@@ -9,8 +9,19 @@ or specific to servers"""
 
 
 def create_link(existing_path, desired_link_path):
-    if not os.path.exists(desired_link_path):
+    """Guarantees the existence of a symlink file at desired_link_path pointing at existing_path. If a file already
+    exists at desired_link_path, it will be replaced if it is not already a link file that is pointing at
+    existing_path"""
+    # Check if link file does not exist yet.
+    if not os.path.lexists(desired_link_path):
         os.symlink(existing_path, desired_link_path)
+    else:
+        # Check if link file is pointing at a nonexistent file OR is pointing at the wrong file.
+        # This condition also returns true if desired_link_path is an ordinary (non-link) file and existing_path != desired_link_path
+        if not os.path.exists(desired_link_path) or not os.path.samefile(existing_path, desired_link_path):
+            os.remove(desired_link_path)
+            os.symlink(existing_path, desired_link_path)
+
 
 def get_audio_from_src_attribute(src, encoding):
     _, raw = src.split(',')
