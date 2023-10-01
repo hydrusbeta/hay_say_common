@@ -1,5 +1,3 @@
-from .file_integration import OUTPUT_DIR, model_dirs
-
 from flask import request
 
 import os
@@ -8,23 +6,6 @@ import json
 
 
 """Methods that are useful across multiple architecture servers"""
-
-
-def get_model_path(architecture, character):
-    character_dir = [os.path.join(model_dir, character)
-                     for model_dir in model_dirs(architecture)
-                     if os.path.exists(os.path.join(model_dir, character))]
-    if len(character_dir) == 0:
-        raise Exception('Character directory was not found! Expected to find a subdirectory named ' + character + ' in '
-                        'one of these directories: ' + ', '.join(model_dirs(architecture)))
-    elif len(character_dir) > 1:
-        raise Exception('More than one character directory with the name ' + character + ' was found! Expected to '
-                        'find only one subdirectory with that name among all of the following directories: ' +
-                        ', '.join(model_dirs(architecture)) + '. Since more than one was found, it is '
-                        'impossible to determine which one the user intended to use. All models must have unique '
-                        'names.')
-    else:
-        return character_dir[0]
 
 
 def clean_up(files_to_delete):
@@ -44,11 +25,9 @@ def construct_full_error_message(architecture_root_dir, files_to_delete):
 
 def construct_error_message(architecture_root_dir):
     input_files = get_file_list(architecture_root_dir)
-    output_files = get_file_list(OUTPUT_DIR)
     return 'An error occurred while generating the output: \n' + traceback.format_exc() + \
            '\n\nPayload:\n' + json.dumps(request.json) + \
-           '\n\nInput Audio Dir Listing: \n' + input_files + \
-           '\n\nOutput Audio Dir Listing: \n' + output_files
+           '\n\nInput Audio Dir Listing: \n' + input_files
 
 
 def get_file_list(folder):
@@ -56,3 +35,12 @@ def get_file_list(folder):
         return ', '.join(os.listdir(folder))
     else:
         return folder + ' does not exist'
+
+
+def select_hardware(gpu_id):
+    """Select which GPU will be used by setting the CUDA_VISIBLE_DEVICES environment variable. gpu_id can be an integer
+    or a string. A typical values is '0', which will select the first CUDA-capable device. And empty string is also an
+    acceptable value and will cause the CPU to be used instead of the GPU."""
+    env = os.environ.copy()
+    env['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
+    return env
