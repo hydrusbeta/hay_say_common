@@ -21,7 +21,7 @@ if not os.path.exists(CUSTOM_MODELS_DIR):
 
 
 def get_model_path(architecture_name, character_name):
-    """Deprecated. Use characters_dir instead.
+    """Deprecated. Use character_dir instead.
     Returns the directory where the files for a given character model in a given architecture are stored."""
     character_dir = [os.path.join(model_dir, character_name)
                      for model_dir in model_dirs(architecture_name)

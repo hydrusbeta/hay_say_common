@@ -1,9 +1,9 @@
-from flask import request
-
-import os
-import traceback
 import json
+import os
+import subprocess
+import traceback
 
+from flask import request
 
 """Methods that are useful across multiple architecture servers"""
 
@@ -44,3 +44,27 @@ def select_hardware(gpu_id):
     env = os.environ.copy()
     env['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
     return env
+
+def get_gpu_info_from_another_venv(path_to_python_executable):
+    """Returns a list of dictionaries containing the GPU ID, name, free memory, and total memory of each GPU that is
+    visible to pytorch in the specified python environment. In Hay Say, there are often two virtual environments
+    installed in a given container - one for the architecture and one for a Flask server that wraps the architecture in
+    a REST interface. The Flask server does not have pytorch installed, but needs to know which GPUs are visible to the
+    architecture, so this method is designed to remotely run commands on the other virtual environment, via the
+    subprocess module. You can actually specify any python executable, but you'll probably want to specify the
+    executable that is located in the architecture's virtual environment, e.g.
+    "/root/hay_say/.venvs/so_vits_svc_4/bin/python3" """
+    code = ['import torch; '
+            'import json; '
+            'gpu_info = [ '
+            '    { '
+            '        "Index": i, '
+            '        "Name": torch.cuda.get_device_properties(i).name, '
+            '        "Free Memory": torch.cuda.mem_get_info(i)[0], '
+            '        "Total Memory": torch.cuda.mem_get_info(i)[1] '
+            '    } '
+            'for i in range(torch.cuda.device_count())]; '
+            'print(json.dumps(gpu_info))']
+    gpus = subprocess.check_output([path_to_python_executable, '-c', *code])
+    return json.loads(gpus.decode('utf-8'))
+

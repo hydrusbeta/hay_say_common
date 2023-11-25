@@ -30,7 +30,8 @@ from .server_utility import (
     construct_full_error_message,
     construct_error_message,
     get_file_list,
-    select_hardware
+    select_hardware,
+    get_gpu_info_from_another_venv
 )
 
 from .cache import (
