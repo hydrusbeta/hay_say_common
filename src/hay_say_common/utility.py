@@ -4,8 +4,8 @@ import base64
 import io
 import os
 
-"""Methods that are useful across multiple Hay Say coding projects and are not necessarily related to file integration
-or specific to servers"""
+"""Methods that are useful across multiple Hay Say coding projects and are not necessarily related to file integration, 
+caching, or specific to servers"""
 
 
 def create_link(existing_path, desired_link_path):
@@ -65,3 +65,15 @@ def get_files_with_extension(directory, extension):
 
 def get_files_ending_with(directory, endswith):
     return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith(endswith)]
+
+
+def get_full_file_path(folder, filename_sans_extension):
+    """Given a folder and a filename without an extension, find the full path of that file with the extension.
+    Assumption: there should only be one file in the folder whose name without the extension is
+    filename_sans_extension."""
+    potential_filenames = [file for file in os.listdir(folder) if file.split('.')[0] == filename_sans_extension]
+    if len(potential_filenames) > 1:
+        raise Exception('more than one file with the same hash found')
+    elif len(potential_filenames) == 0:
+        raise Exception('file with name ' + filename_sans_extension + ' not found')
+    return os.path.join(folder, potential_filenames[0])

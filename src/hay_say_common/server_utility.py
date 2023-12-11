@@ -1,30 +1,11 @@
-from .file_integration import OUTPUT_DIR, model_dirs
+import json
+import os
+import subprocess
+import traceback
 
 from flask import request
 
-import os
-import traceback
-import json
-
-
 """Methods that are useful across multiple architecture servers"""
-
-
-def get_model_path(architecture, character):
-    character_dir = [os.path.join(model_dir, character)
-                     for model_dir in model_dirs(architecture)
-                     if os.path.exists(os.path.join(model_dir, character))]
-    if len(character_dir) == 0:
-        raise Exception('Character directory was not found! Expected to find a subdirectory named ' + character + ' in '
-                        'one of these directories: ' + ', '.join(model_dirs(architecture)))
-    elif len(character_dir) > 1:
-        raise Exception('More than one character directory with the name ' + character + ' was found! Expected to '
-                        'find only one subdirectory with that name among all of the following directories: ' +
-                        ', '.join(model_dirs(architecture)) + '. Since more than one was found, it is '
-                        'impossible to determine which one the user intended to use. All models must have unique '
-                        'names.')
-    else:
-        return character_dir[0]
 
 
 def clean_up(files_to_delete):
@@ -44,11 +25,9 @@ def construct_full_error_message(architecture_root_dir, files_to_delete):
 
 def construct_error_message(architecture_root_dir):
     input_files = get_file_list(architecture_root_dir)
-    output_files = get_file_list(OUTPUT_DIR)
     return 'An error occurred while generating the output: \n' + traceback.format_exc() + \
            '\n\nPayload:\n' + json.dumps(request.json) + \
-           '\n\nInput Audio Dir Listing: \n' + input_files + \
-           '\n\nOutput Audio Dir Listing: \n' + output_files
+           '\n\nInput Audio Dir Listing: \n' + input_files
 
 
 def get_file_list(folder):
@@ -56,3 +35,36 @@ def get_file_list(folder):
         return ', '.join(os.listdir(folder))
     else:
         return folder + ' does not exist'
+
+
+def select_hardware(gpu_id):
+    """Select which GPU will be used by setting the CUDA_VISIBLE_DEVICES environment variable. gpu_id can be an integer
+    or a string. A typical values is '0', which will select the first CUDA-capable device. And empty string is also an
+    acceptable value and will cause the CPU to be used instead of the GPU."""
+    env = os.environ.copy()
+    env['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
+    return env
+
+def get_gpu_info_from_another_venv(path_to_python_executable):
+    """Returns a list of dictionaries containing the GPU ID, name, free memory, and total memory of each GPU that is
+    visible to pytorch in the specified python environment. In Hay Say, there are often two virtual environments
+    installed in a given container - one for the architecture and one for a Flask server that wraps the architecture in
+    a REST interface. The Flask server does not have pytorch installed, but needs to know which GPUs are visible to the
+    architecture, so this method is designed to remotely run commands on the other virtual environment, via the
+    subprocess module. You can actually specify any python executable, but you'll probably want to specify the
+    executable that is located in the architecture's virtual environment, e.g.
+    "/root/hay_say/.venvs/so_vits_svc_4/bin/python3" """
+    code = ['import torch; '
+            'import json; '
+            'gpu_info = [ '
+            '    { '
+            '        "Index": i, '
+            '        "Name": torch.cuda.get_device_properties(i).name, '
+            '        "Free Memory": torch.cuda.mem_get_info(i)[0], '
+            '        "Total Memory": torch.cuda.mem_get_info(i)[1] '
+            '    } '
+            'for i in range(torch.cuda.device_count())]; '
+            'print(json.dumps(gpu_info))']
+    gpus = subprocess.check_output([path_to_python_executable, '-c', *code])
+    return json.loads(gpus.decode('utf-8'))
+
